@@ -10,8 +10,14 @@ class Exercise(models.Model):
     def __str__(self):
         return self.name
 class WorkoutPlan(models.Model):
-    title = models.CharField(max_length = 30)
-    exercises = models.ManyToManyField(Exercise , through = 'PlanExercise')
+    owner = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='workout_plans',
+    )
+    title = models.CharField(max_length=30)
+    is_public = models.BooleanField(default=False)
+    exercises = models.ManyToManyField(Exercise, through='PlanExercise')
 
     def __str__(self):
         return self.title

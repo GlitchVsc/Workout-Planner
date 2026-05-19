@@ -11,7 +11,8 @@ class PlanExerciseInline(admin.TabularInline):
 @admin.register(WorkoutPlan)
 class WorkoutPlanAdmin(admin.ModelAdmin):
     inlines = [PlanExerciseInline] # Εδώ "κουμπώνεις" τον πίνακα από πάνω
-    list_display = ('title',)
+    list_display = ('title', 'owner', 'is_public')
+    list_filter = ('is_public', 'owner')
 
 # 3. Απλό registration για τις ασκήσεις
 @admin.register(Exercise)
