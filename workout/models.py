@@ -1,5 +1,8 @@
-from django.db import models
 from django.conf import settings
+from django.db import models
+from django.utils import timezone
+
+from .validators import validate_workout_log_data
 
 
 class ExerciseCategory(models.TextChoices):
@@ -76,17 +79,26 @@ class PlanExercise(models.Model):
         return f'{self.plan.title} — {self.exercise.name} (#{self.order})'
 
 class WorkoutLog(models.Model):
-    # onoma tou User
-    user = models.ForeignKey(settings.AUTH_USER_MODEL , on_delete = models.CASCADE )
-    # to plano pou tha katagrafei sto log 
-    plan = models.ForeignKey(WorkoutPlan,  on_delete = models.SET_NULL , null = True)
-    # to date
-    date = models.DateField(auto_now_add = True)
-    # ti data stelnw
-    data = models.JSONField()
-    # kapoio sxolio
-    comments = models.TextField (null= True , blank = True)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='workout_logs',
+    )
+    plan = models.ForeignKey(
+        WorkoutPlan,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name='workout_logs',
+    )
+    date = models.DateField(default=timezone.localdate)
+    data = models.JSONField(validators=[validate_workout_log_data])
+    comments = models.TextField(null=True, blank=True)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=['user', '-date']),
+        ]
 
     def __str__(self):
-        
-        return f"{self.user.username} - {self.plan.title if self.plan else 'Custom'} - {self.date.strftime('%d/%m/%Y')}"
+        plan_label = self.plan.title if self.plan else 'Custom'
+        return f'{self.user.username} — {plan_label} — {self.date:%d/%m/%Y}'
