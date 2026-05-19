@@ -5,7 +5,8 @@ from .models import *
 # 1. Ορίζεις πώς θα εμφανίζεται η "σχέση" μέσα στην άλλη σελίδα
 class PlanExerciseInline(admin.TabularInline):
     model = PlanExercise
-    extra = 1  # Πόσες κενές γραμμές να σου βγάζει αυτόματα για νέες ασκήσεις
+    extra = 1
+    fields = ('exercise', 'order', 'target_sets', 'target_reps', 'rest_seconds')
 
 # 2. Ορίζεις το κύριο Admin του WorkoutPlan
 @admin.register(WorkoutPlan)
@@ -17,8 +18,8 @@ class WorkoutPlanAdmin(admin.ModelAdmin):
 # 3. Απλό registration για τις ασκήσεις
 @admin.register(Exercise)
 class ExerciseAdmin(admin.ModelAdmin):
-    list_display = ('name', 'category', 'type')
-    list_filter = ('category', 'type')
+    list_display = ('name', 'category', 'exercise_type')
+    list_filter = ('category', 'exercise_type')
 
 @admin.register(WorkoutLog)
 class WorkoutLogAdmin(admin.ModelAdmin):
